@@ -1,7 +1,9 @@
 package dev.goltsov.shortlinksgenerator.security;
 
 import dev.goltsov.shortlinksgenerator.User;
+import dev.goltsov.shortlinksgenerator.dto.JwtTokens;
 import dev.goltsov.shortlinksgenerator.service.UserService;
+import io.jsonwebtoken.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -17,19 +19,19 @@ public class AuthService {
         this.jwtService = jwtService;
     }
 
-    public Map<String, String> registration(String username, String password) {
+    public JwtTokens registration(String username, String password) {
         if (userService.existsByUsername(username)) {
             throw new IncorrectLoginOrPassword("Incorrect login or password");
         }
         User newUser = new User(username, PasswordUtils.hashPassword(password));
         newUser = userService.newUser(newUser);
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", jwtService.generateAccessToken(username));
-        tokens.put("refreshToken", jwtService.generateRefreshToken(username));
-        return tokens;
+        return new JwtTokens(
+                jwtService.generateAccessToken(username),
+                jwtService.generateRefreshToken(username)
+        );
     }
 
-    public Map<String, String> authentication(String username, String password) {
+    public JwtTokens authentication(String username, String password) {
         if (!userService.existsByUsername(username)) {
             throw new IncorrectLoginOrPassword("Incorrect login or password");
         }
@@ -37,9 +39,9 @@ public class AuthService {
         if (!PasswordUtils.checkPassword(password, user.getPassword())) {
             throw new IncorrectLoginOrPassword("Incorrect login or password");
         }
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", jwtService.generateAccessToken(username));
-        tokens.put("refreshToken", jwtService.generateRefreshToken(username));
-        return tokens;
+        return new JwtTokens(
+                jwtService.generateAccessToken(username),
+                jwtService.generateRefreshToken(username)
+        );
     }
 }
