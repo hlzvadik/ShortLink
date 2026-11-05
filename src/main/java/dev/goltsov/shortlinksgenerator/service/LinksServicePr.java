@@ -1,6 +1,7 @@
 package dev.goltsov.shortlinksgenerator.service;
 
 import dev.goltsov.shortlinksgenerator.Links;
+import dev.goltsov.shortlinksgenerator.User;
 import dev.goltsov.shortlinksgenerator.repository.LinksRepository;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -15,24 +16,25 @@ import java.util.Base64;
 
 @Service
 @Slf4j
-public class ShortLinkServicePr {
+public class LinksServicePr {
 
     private final LinksRepository linksRepository;
 
-    public ShortLinkServicePr(LinksRepository linksRepository) {
+    public LinksServicePr(LinksRepository linksRepository) {
         this.linksRepository = linksRepository;
     }
 
     @Transactional
-    public String getShortLinkPr(String longLink) {
+    public String getShortLinkPr(String longLink, User user) {
         LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
         Links links = linksRepository.findByLongLink(longLink);
 
-        if (links == null) {
+        if (links == null || links.getUser() != user) {
             links = new Links();
             links.setLongLink(longLink);
             links.setShortLink(generateUniqueCode(longLink));
             links.setCreatedAt(now);
+            links.setUser(user);
             log.info("Created new record: {}", links.toString());
         } else if (now.isAfter(links.getCreatedAt().plusMinutes(10))) {
             links.setCreatedAt(now);

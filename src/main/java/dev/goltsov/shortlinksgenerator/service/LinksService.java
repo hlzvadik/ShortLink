@@ -1,46 +1,39 @@
 package dev.goltsov.shortlinksgenerator.service;
 
 import dev.goltsov.shortlinksgenerator.Links;
+import dev.goltsov.shortlinksgenerator.User;
 import dev.goltsov.shortlinksgenerator.exception.LinkExpiredException;
 import dev.goltsov.shortlinksgenerator.exception.LinkNotFoundException;
 import dev.goltsov.shortlinksgenerator.repository.LinksRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.concurrent.Semaphore;
 
 @Service
 @Slf4j
-public class ShortLinkService {
+public class LinksService {
 
     private final LinksRepository linksRepository;
 
     private static Semaphore nowLoad = new Semaphore(1000);
-    private final ShortLinkServicePr shortLinkServicePr;
+    private final LinksServicePr shortLinkServicePr;
 
-    public ShortLinkService(LinksRepository linksRepository, ShortLinkServicePr shortLinkServicePr) {
+    public LinksService(LinksRepository linksRepository, LinksServicePr shortLinkServicePr) {
         this.linksRepository = linksRepository;
         this.shortLinkServicePr = shortLinkServicePr;
     }
 
-    public String getShortLink(String longLink) {
+    public String getShortLink(String longLink, User user) {
         try {
             nowLoad.acquire();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
         try {
-            Thread.sleep(1000);
-            return shortLinkServicePr.getShortLinkPr(longLink);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            return shortLinkServicePr.getShortLinkPr(longLink, user);
         } finally {
             nowLoad.release();
         }

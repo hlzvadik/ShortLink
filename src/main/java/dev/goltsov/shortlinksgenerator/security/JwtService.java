@@ -77,7 +77,7 @@ public class JwtService {
         return extractAllClaims(token, accessKey).getSubject();
     }
 
-    public String extractEmailFromRefreshToken(String token) {
+    public String extractUsernameFromRefreshToken(String token) {
         return extractAllClaims(token, refreshKey).getSubject();
     }
 
@@ -122,8 +122,8 @@ public class JwtService {
         if (!validateRefreshToken(refreshToken)) {
             throw new RuntimeException("Invalid refresh token");
         } else {
-            String userEmail = extractEmailFromRefreshToken(refreshToken);
-            return generateAccessToken(userEmail);
+            String username = extractUsernameFromRefreshToken(refreshToken);
+            return generateAccessToken(username);
         }
     }
 

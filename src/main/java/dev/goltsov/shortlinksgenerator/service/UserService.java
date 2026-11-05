@@ -1,5 +1,6 @@
 package dev.goltsov.shortlinksgenerator.service;
 
+import dev.goltsov.shortlinksgenerator.Links;
 import dev.goltsov.shortlinksgenerator.User;
 import dev.goltsov.shortlinksgenerator.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,5 +28,13 @@ public class UserService {
 
     public User getUserByUsername(String username) {
         return userRepository.findUsersByUsername(username);
+    }
+
+    public void addLinks(User user, Links links) {
+        user.addLinks(links);
+    }
+
+    public void removeLinks(User user, Links links) {
+        user.removeLinks(links);
     }
 }

@@ -41,7 +41,7 @@ public class AuthController {
         if (!jwtService.validateRefreshToken(refreshToken)) {
             return ResponseEntity.status(401).build();
         }
-        String username = jwtService.extractUsername(refreshToken);
+        String username = jwtService.extractUsernameFromRefreshToken(refreshToken);
         if (username == null || !userService.existsByUsername(username)) {
             return ResponseEntity.status(401).build();
         }

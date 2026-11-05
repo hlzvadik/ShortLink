@@ -33,4 +33,8 @@ public class Links {
         this.shortLink = shortLink;
         this.createdAt = createdAt;
     }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }
